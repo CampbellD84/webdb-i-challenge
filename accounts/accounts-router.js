@@ -42,20 +42,47 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  // const {id} = req.params;
-  // const acctChanges = req.body;
-  // const count = await db('accounts').where("id", '=', id).update(acctChanges);
-  // try {
-  //     if (count) {
-  //         res.status(200).json({updated: count});
-  //     } else {
-  //         res.status(404).json({message: `Cannot find account with ID of ${id}.` });
-  //     }
-  // } catch ({error}) {
-  //     res.status(500).json({ error, message: "Could not update account."});
-  // }
+  const { id } = req.params;
+  const acctChanges = req.body;
+  const count = await db("accounts")
+    .where("id", "=", id)
+    .update(acctChanges);
+  try {
+    if (count) {
+      res.status(200).json({ updated: count });
+    } else {
+      res
+        .status(404)
+        .json({ message: `Cannot find account with ID of ${id}.` });
+    }
+  } catch ({ error }) {
+    res.status(500).json({ error, message: "Could not update account." });
+  }
 });
 
-router.delete("/:id", async (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const count = await db("accounts")
+    .where({ id })
+    .del();
+
+  try {
+    if (count) {
+      res
+        .status(200)
+        .json({
+          message: `Account with ID of ${id} successfully deleted.`,
+          deleted: count
+        });
+    } else {
+      res
+        .status(404)
+        .json({ message: `Account with ID of ${id} could not be found.` });
+    }
+  } catch ({ error }) {
+    res.status(500).json({ error, message: "Could not delete account." });
+  }
+});
 
 module.exports = router;
